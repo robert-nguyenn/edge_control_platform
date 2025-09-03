@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    .component { fill: #1E88E5; stroke: #0D47A1; stroke-width: 2; }
+    .subcomponent { fill: #90CAF9; stroke: #1565C0; stroke-width: 2; }
+    .label { font-family: Arial, sans-serif; font-size: 18px; fill: #333; }
+    .title { font-family: Arial, sans-serif; font-size: 24px; fill: white; font-weight: bold; }
+    .subtitle { font-family: Arial, sans-serif; font-size: 16px; fill: white; }
+    .arrow { stroke: #546E7A; stroke-width: 2; marker-end: url(#arrowhead); }
+    .banner { fill: #2196F3; }
+    .section-title { font-family: Arial, sans-serif; font-size: 22px; fill: #333; font-weight: bold; }
+    .bg { fill: #F5F5F5; }
+    .container { fill: #ECEFF1; stroke: #90A4AE; stroke-width: 2; stroke-dasharray: 5,3; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#546E7A"/>
+    </marker>
+  </defs>
+  
+  <rect class="bg" x="0" y="0" width="1200" height="800" />
+  
+  <!-- Banner -->
+  <rect class="banner" x="0" y="0" width="1200" height="80" />
+  <text x="600" y="50" style="font-family: Arial, sans-serif; font-size: 32px; fill: white; text-anchor: middle; font-weight: bold;">Feature Flag System - Detailed View</text>
+  
+  <!-- Feature Flag System Container -->
+  <rect class="container" x="50" y="120" width="1100" height="650" rx="10" />
+  <text x="100" y="160" class="section-title">Feature Flag System Components</text>
+
+  <!-- Flag Storage and Management -->
+  <rect class="component" x="100" y="200" width="400" height="260" rx="5" />
+  <text class="title" x="300" y="230" text-anchor="middle">Flag Storage and Management</text>
+  
+  <rect class="subcomponent" x="120" y="260" width="360" height="50" rx="5" />
+  <text class="label" x="300" y="290" text-anchor="middle">Flag Configuration Store</text>
+  
+  <rect class="subcomponent" x="120" y="320" width="360" height="50" rx="5" />
+  <text class="label" x="300" y="350" text-anchor="middle">Audit Logging System</text>
+  
+  <rect class="subcomponent" x="120" y="380" width="360" height="50" rx="5" />
+  <text class="label" x="300" y="410" text-anchor="middle">Schema Validation Layer</text>
+
+  <!-- Flag Evaluation Engine -->
+  <rect class="component" x="600" y="200" width="500" height="260" rx="5" />
+  <text class="title" x="850" y="230" text-anchor="middle">Flag Evaluation Engine</text>
+  
+  <rect class="subcomponent" x="620" y="260" width="220" height="50" rx="5" />
+  <text class="label" x="730" y="290" text-anchor="middle">Percentage Rollout</text>
+  
+  <rect class="subcomponent" x="860" y="260" width="220" height="50" rx="5" />
+  <text class="label" x="970" y="290" text-anchor="middle">User Attribute Targeting</text>
+  
+  <rect class="subcomponent" x="620" y="320" width="220" height="50" rx="5" />
+  <text class="label" x="730" y="350" text-anchor="middle">Consistent Hashing</text>
+  
+  <rect class="subcomponent" x="860" y="320" width="220" height="50" rx="5" />
+  <text class="label" x="970" y="350" text-anchor="middle">A/B/n Testing Logic</text>
+  
+  <rect class="subcomponent" x="620" y="380" width="220" height="50" rx="5" />
+  <text class="label" x="730" y="410" text-anchor="middle">Rule Evaluation</text>
+  
+  <rect class="subcomponent" x="860" y="380" width="220" height="50" rx="5" />
+  <text class="label" x="970" y="410" text-anchor="middle">Override Management</text>
+  
+  <!-- SDK Infrastructure -->
+  <rect class="component" x="100" y="500" width="400" height="220" rx="5" />
+  <text class="title" x="300" y="530" text-anchor="middle">SDK Infrastructure</text>
+  
+  <rect class="subcomponent" x="120" y="560" width="170" height="50" rx="5" />
+  <text class="label" x="205" y="590" text-anchor="middle">Local Caching</text>
+  
+  <rect class="subcomponent" x="310" y="560" width="170" height="50" rx="5" />
+  <text class="label" x="395" y="590" text-anchor="middle">Background Polling</text>
+  
+  <rect class="subcomponent" x="120" y="620" width="170" height="50" rx="5" />
+  <text class="label" x="205" y="650" text-anchor="middle">Failure Recovery</text>
+  
+  <rect class="subcomponent" x="310" y="620" width="170" height="50" rx="5" />
+  <text class="label" x="395" y="650" text-anchor="middle">ETags Support</text>
+  
+  <!-- Observability System -->
+  <rect class="component" x="600" y="500" width="500" height="220" rx="5" />
+  <text class="title" x="850" y="530" text-anchor="middle">Observability System</text>
+  
+  <rect class="subcomponent" x="620" y="560" width="220" height="50" rx="5" />
+  <text class="label" x="730" y="590" text-anchor="middle">Flag Metrics Collection</text>
+  
+  <rect class="subcomponent" x="860" y="560" width="220" height="50" rx="5" />
+  <text class="label" x="970" y="590" text-anchor="middle">Usage Analytics</text>
+  
+  <rect class="subcomponent" x="620" y="620" width="220" height="50" rx="5" />
+  <text class="label" x="730" y="650" text-anchor="middle">Health Monitoring</text>
+  
+  <rect class="subcomponent" x="860" y="620" width="220" height="50" rx="5" />
+  <text class="label" x="970" y="650" text-anchor="middle">Distributed Tracing</text>
+  
+  <!-- Arrows -->
+  <line class="arrow" x1="300" y1="460" x2="300" y2="490" />
+  <line class="arrow" x1="500" y1="330" x2="590" y2="330" />
+  <line class="arrow" x1="850" y1="460" x2="850" y2="490" />
+  <line class="arrow" x1="500" y1="610" x2="590" y2="610" />
+</svg>
