@@ -1,0 +1,77 @@
+@startuml deployment
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+title "Edge Control Platform - Deployment Diagram"
+
+Deployment_Node(aws, "AWS Cloud") {
+  Deployment_Node(vpc, "VPC") {
+    Deployment_Node(eks, "EKS Cluster") {
+      Deployment_Node(nginx_ingress, "NGINX Ingress") {
+        Container(ingress, "Ingress Controller", "NGINX", "Routes external traffic to services")
+      }
+      
+      Deployment_Node(app_pods, "Application Tier") {
+        Container(web_admin_pod, "Web Admin Pod", "React + NGINX", "Web administration interface")
+        Container(api_pod, "API Pod", "ASP.NET Core", "Core API service")
+        Container(go_sidecar_pod, "Go Sidecar Pod", "Go 1.21", "API Gateway with circuit breakers")
+        Container(rate_limiter_pod, "Rate Limiter Pod", "C++20", "Token bucket rate limiter")
+      }
+      
+      Deployment_Node(data_pods, "Data Tier") {
+        Container(redis_pod, "Redis Pod", "Redis", "In-memory cache for flags and rate limits")
+        Container(postgres_pod, "PostgreSQL Pod", "PostgreSQL", "Persistent storage for flags and audit logs")
+      }
+      
+      Deployment_Node(monitor_pods, "Monitoring Tier") {
+        Container(prometheus_pod, "Prometheus Pod", "Prometheus", "Metrics collection and storage")
+        Container(grafana_pod, "Grafana Pod", "Grafana", "Metrics visualization")
+      }
+    }
+    
+    Deployment_Node(storage, "Storage") {
+      ContainerDb(ebs_postgres, "EBS Volume", "AWS EBS", "Persistent storage for PostgreSQL")
+    }
+  }
+  
+  Deployment_Node(route53, "Route 53") {
+    Container(dns, "DNS", "Route 53", "DNS management")
+  }
+  
+  Deployment_Node(acm, "ACM") {
+    Container(cert, "SSL Certificate", "ACM", "SSL certificate for HTTPS")
+  }
+}
+
+Deployment_Node(client_env, "Client Environment") {
+  Container(node_app, "Node.js Application", "Node.js", "Backend application using SDK")
+  Container(java_app, "Java Application", "Java", "Backend application using SDK")
+  Container(browser, "Web Browser", "Browser", "Accessing admin interface")
+}
+
+Rel(dns, ingress, "Routes traffic", "DNS")
+Rel(cert, ingress, "Secures traffic", "SSL/TLS")
+
+Rel(browser, ingress, "Accesses", "HTTPS")
+Rel(ingress, web_admin_pod, "Routes to", "HTTP")
+Rel(ingress, go_sidecar_pod, "Routes to", "HTTP")
+
+Rel(node_app, go_sidecar_pod, "Requests flags", "HTTPS")
+Rel(java_app, go_sidecar_pod, "Requests flags", "HTTPS")
+
+Rel(go_sidecar_pod, api_pod, "Routes requests", "HTTP")
+Rel(api_pod, rate_limiter_pod, "Checks limits", "gRPC")
+Rel(api_pod, redis_pod, "Caches data", "Redis")
+Rel(api_pod, postgres_pod, "Persists data", "SQL/TLS")
+Rel(rate_limiter_pod, redis_pod, "Stores limits", "Redis")
+
+Rel(postgres_pod, ebs_postgres, "Stores on", "Volume mount")
+
+Rel(api_pod, prometheus_pod, "Exports metrics", "HTTP")
+Rel(go_sidecar_pod, prometheus_pod, "Exports metrics", "HTTP")
+Rel(rate_limiter_pod, prometheus_pod, "Exports metrics", "HTTP")
+Rel(redis_pod, prometheus_pod, "Exports metrics", "HTTP")
+Rel(postgres_pod, prometheus_pod, "Exports metrics", "HTTP")
+
+Rel(prometheus_pod, grafana_pod, "Provides data", "HTTP")
+
+@enduml

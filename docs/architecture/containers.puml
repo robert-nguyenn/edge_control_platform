@@ -1,0 +1,47 @@
+@startuml C4Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title "Edge Control Platform - Container Diagram"
+
+Person(developer, "Developer", "Application developer integrating with feature flags")
+Person(admin, "Administrator", "Platform administrator configuring flags and rules")
+
+System_Boundary(edge_control, "Edge Control Platform") {
+    Container(web_admin, "Web Admin UI", "React + Material UI", "Management interface for flags and rules")
+    Container(api_dotnet, ".NET API", "ASP.NET Core 8", "Core service managing flags and integrating with other systems")
+    Container(rate_limiter, "C++ Rate Limiter", "C++20 + gRPC", "High-performance token bucket rate limiter")
+    Container(go_sidecar, "Go Sidecar", "Go 1.21", "Resilience layer with circuit breakers, retries")
+    
+    ContainerDb(postgres, "PostgreSQL", "Database", "Stores feature flags, rules, and audit logs")
+    ContainerDb(redis, "Redis", "In-memory cache", "Caches flags and rate limiter state")
+    
+    Container(node_sdk, "Node.js SDK", "TypeScript", "Client SDK for Node.js applications")
+    Container(java_sdk, "Java SDK", "Java", "Client SDK for Java applications")
+}
+
+System_Ext(app_backend, "Customer App Backend", "Backend application using feature flags")
+System_Ext(app_frontend, "Customer App Frontend", "Frontend application using feature flags")
+System_Ext(monitoring, "Monitoring System", "Prometheus/Grafana for system monitoring")
+
+Rel(admin, web_admin, "Uses", "HTTPS")
+Rel(developer, web_admin, "Views documentation", "HTTPS")
+
+Rel(web_admin, api_dotnet, "Uses API", "HTTPS / GraphQL")
+Rel(api_dotnet, postgres, "Reads/writes", "SQL/TLS")
+Rel(api_dotnet, redis, "Caches flags", "Redis protocol")
+Rel(api_dotnet, rate_limiter, "Checks limits", "gRPC")
+
+Rel(go_sidecar, api_dotnet, "Routes requests", "HTTP")
+Rel(app_backend, go_sidecar, "Checks flags, limits", "HTTPS")
+
+Rel(node_sdk, go_sidecar, "Polls for flags", "HTTPS")
+Rel(java_sdk, go_sidecar, "Polls for flags", "HTTPS")
+
+Rel(app_backend, node_sdk, "Uses", "Library")
+Rel(app_frontend, java_sdk, "Uses", "Library")
+
+Rel(api_dotnet, monitoring, "Exports metrics", "Prometheus protocol")
+Rel(rate_limiter, monitoring, "Exports metrics", "Prometheus protocol")
+Rel(go_sidecar, monitoring, "Exports metrics", "Prometheus protocol")
+
+@enduml

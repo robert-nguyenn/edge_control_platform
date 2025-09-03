@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "EdgeControlApi.RateLimiting";
+
+package ratelimiting;
+
+service RateLimiter {
+  // Check if a request should be allowed based on token bucket algorithm
+  rpc Allow (AllowRequest) returns (AllowResponse);
+  
+  // Get current token bucket status
+  rpc Status (StatusRequest) returns (StatusResponse);
+  
+  // Configure a rate limiter for a key
+  rpc Configure (ConfigureRequest) returns (ConfigureResponse);
+}
+
+message AllowRequest {
+  string key = 1;
+  uint32 token_cost = 2;
+  string client_id = 3;
+}
+
+message AllowResponse {
+  bool allowed = 1;
+  int64 retry_after_ms = 2;
+  double quota_remaining = 3;
+}
+
+message StatusRequest {
+  string key = 1;
+}
+
+message StatusResponse {
+  string key = 1;
+  double tokens_remaining = 2;
+  double refill_rate = 3;
+  double bucket_capacity = 4;
+  int64 last_refill_time_ms = 5;
+}
+
+message ConfigureRequest {
+  string key = 1;
+  double refill_rate = 2;     // tokens per second
+  double bucket_capacity = 3; // maximum tokens
+}
+
+message ConfigureResponse {
+  bool success = 1;
+  string message = 2;
+}

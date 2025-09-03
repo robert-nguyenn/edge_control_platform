@@ -1,0 +1,45 @@
+@startuml EdgeControlPlatformArchitecture
+
+!include <C4/C4_Container>
+
+title Edge Control Platform - Architecture Overview
+
+Person(developer, "Application Developer", "Uses SDKs to integrate feature flags")
+Person(admin, "Platform Administrator", "Manages feature flags")
+
+System_Boundary(edge_control, "Edge Control Platform") {
+    Container(web_admin, "Web Admin UI", "React, Material UI", "Provides interface for managing flags")
+    
+    Container(go_sidecar, "Go Sidecar", "Go", "Provides circuit breaking, retries, and timeouts")
+    
+    Container(api_dotnet, "API Service", ".NET 8, ASP.NET Core", "Manages feature flags and provides REST/GraphQL APIs")
+    
+    Container(rate_limiter, "Rate Limiter", "C++20", "High-performance token bucket implementation")
+    
+    ContainerDb(postgres, "PostgreSQL", "Database", "Stores feature flags and audit logs")
+    ContainerDb(redis, "Redis", "Cache", "Provides flag caching and improves performance")
+    
+    Container(prometheus, "Prometheus", "Metrics", "Collects and stores metrics")
+    Container(grafana, "Grafana", "Dashboard", "Visualizes metrics")
+}
+
+System_Ext(nodejs_app, "Node.js Application", "Uses Node.js SDK")
+System_Ext(java_app, "Java Application", "Uses Java SDK")
+
+Rel(admin, web_admin, "Uses", "HTTPS")
+Rel(web_admin, go_sidecar, "Calls API via", "HTTP")
+Rel(go_sidecar, api_dotnet, "Routes requests to", "HTTP")
+Rel(api_dotnet, postgres, "Reads/writes", "SQL/TCP")
+Rel(api_dotnet, redis, "Caches flags in", "RESP/TCP")
+Rel(api_dotnet, rate_limiter, "Calls", "gRPC")
+Rel(prometheus, api_dotnet, "Scrapes metrics from", "HTTP")
+Rel(prometheus, go_sidecar, "Scrapes metrics from", "HTTP")
+Rel(prometheus, rate_limiter, "Scrapes metrics from", "HTTP")
+Rel(grafana, prometheus, "Visualizes data from", "HTTP")
+
+Rel(nodejs_app, go_sidecar, "Retrieves flags via", "HTTP")
+Rel(java_app, go_sidecar, "Retrieves flags via", "HTTP")
+Rel(developer, nodejs_app, "Develops")
+Rel(developer, java_app, "Develops")
+
+@enduml

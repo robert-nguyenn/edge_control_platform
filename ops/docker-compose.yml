@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: edge_control
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rate-limiter:
+    build:
+      context: ../rate-limiter-cpp
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-dotnet:
+    build:
+      context: ../api-dotnet
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=edge_control;Username=postgres;Password=postgres
+      - ConnectionStrings__Redis=redis:6379
+      - Services__RateLimiter__Uri=http://rate-limiter:50051
+      - ASPNETCORE_URLS=http://+:80
+    # Direct port is now handled by the sidecar
+    expose:
+      - "80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rate-limiter:
+        condition: service_healthy
+    restart: unless-stopped
+
+  go-sidecar:
+    build:
+      context: ../go-sidecar
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"  # Expose the sidecar on the same port that api-dotnet used to use
+    environment:
+      - TARGET_HOST=http://api-dotnet:80
+    command: [
+      "--target", "http://api-dotnet:80",
+      "--retry-attempts", "3",
+      "--cb-threshold", "5"
+    ]
+    depends_on:
+      - api-dotnet
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:8080/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web-admin:
+    build:
+      context: ../web-admin
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5000
+      - VITE_API_KEY=demo-key
+    ports:
+      - "3000:80"
+    depends_on:
+      - go-sidecar
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - api-dotnet
+      - go-sidecar
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

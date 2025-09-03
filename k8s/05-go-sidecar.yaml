@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-sidecar
+  namespace: edge-control
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: go-sidecar
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: go-sidecar
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+      - name: go-sidecar
+        image: edge-control/go-sidecar:latest
+        imagePullPolicy: IfNotPresent
+        args:
+          - "--listen=:8080"
+          - "--target=http://api-dotnet:80"
+          - "--retry-attempts=3"
+          - "--cb-threshold=5"
+          - "--cb-reset-timeout=30s"
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-sidecar
+  namespace: edge-control
+spec:
+  selector:
+    app: go-sidecar
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

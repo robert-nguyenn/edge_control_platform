@@ -1,0 +1,85 @@
+@startuml EdgeControlPlatform
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!includeurl ICONURL/devicons/dotnet.puml
+!includeurl ICONURL/devicons/golang.puml
+!includeurl ICONURL/devicons/java.puml
+!includeurl ICONURL/devicons/nodejs.puml
+!includeurl ICONURL/devicons/redis.puml
+!includeurl ICONURL/devicons/postgresql.puml
+!includeurl ICONURL/devicons/react.puml
+!includeurl ICONURL/font-awesome/cogs.puml
+
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam linetype ortho
+skinparam ArrowColor #666666
+skinparam ComponentBorderColor #666666
+skinparam DatabaseBorderColor #666666
+skinparam ActorBorderColor #666666
+
+' Clients
+component "<$nodejs>\nNode.js Client" as nodeclient
+component "<$java>\nJava Client" as javaclient
+
+' Services
+package "Edge Control Platform" {
+  component "<$dotnet>\n.NET API" as dotnetapi {
+    component "GraphQL" as graphql
+    component "REST API" as restapi
+    component "EF Core" as efcore
+  }
+  
+  component "<$golang>\nGo Sidecar" as gosidecar {
+    component "Circuit Breaker" as circuitbreaker
+    component "Retries" as retries
+    component "Health Checks" as healthchecks
+  }
+  
+  component "<$cogs>\nC++ Rate Limiter" as cppratelimiter {
+    component "Token Bucket" as tokenbucket
+    component "gRPC Server" as grpcserver
+  }
+  
+  component "<$react>\nWeb Admin UI" as webui
+  
+  database "<$postgresql>\nPostgreSQL" as postgres {
+    component "Feature Flags" as flagsdb
+    component "Audit Log" as auditdb
+  }
+  
+  database "<$redis>\nRedis Cache" as redis
+}
+
+' Monitoring
+package "Monitoring" {
+  component "Prometheus" as prometheus
+  component "Grafana" as grafana
+  component "OpenTelemetry" as otel
+}
+
+' Deploy
+package "Deployment" {
+  component "Docker Compose" as docker
+  component "Kubernetes" as k8s
+  component "Terraform" as terraform
+}
+
+' Connections
+nodeclient --> gosidecar : HTTP/gRPC
+javaclient --> gosidecar : HTTP/gRPC
+webui --> dotnetapi : HTTP/GraphQL
+
+gosidecar --> dotnetapi : HTTP
+dotnetapi --> cppratelimiter : gRPC
+dotnetapi --> redis : Get/Set
+dotnetapi --> postgres : Query/Store
+dotnetapi ..> otel : Emit metrics
+
+cppratelimiter ..> otel : Emit metrics
+gosidecar ..> otel : Emit metrics
+otel --> prometheus : Export metrics
+prometheus --> grafana : Data source
+
+@enduml

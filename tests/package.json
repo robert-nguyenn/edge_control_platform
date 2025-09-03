@@ -1,0 +1,12 @@
+{
+  "name": "edge-control-tests",
+  "version": "1.0.0",
+  "description": "Test suite for Edge Control Platform",
+  "scripts": {
+    "smoke": "bash smoke-test.sh",
+    "sdk-demo": "node sdk-demo.js",
+    "test": "npm run smoke && npm run sdk-demo"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,102 @@
+@startuml data
+!theme cerulean
+
+title "Edge Control Platform - Data Model"
+
+' Feature Flag
+class FeatureFlag {
+  + Id: string
+  + Name: string
+  + Description: string
+  + Enabled: boolean
+  + CreatedAt: datetime
+  + UpdatedAt: datetime
+  + Version: int
+}
+
+' Rules
+abstract class Rule {
+  + Id: string
+  + Type: string
+  + FlagId: string
+  + Priority: int
+}
+
+class PercentageRule {
+  + Value: int
+}
+
+class UserAttributeRule {
+  + Attribute: string
+  + Operator: string
+  + Value: string
+}
+
+class DateRule {
+  + StartDate: datetime
+  + EndDate: datetime
+}
+
+' Audit
+class AuditLog {
+  + Id: string
+  + EntityType: string
+  + EntityId: string
+  + Action: string
+  + UserId: string
+  + Timestamp: datetime
+  + OldValue: json
+  + NewValue: json
+}
+
+' Metrics
+class Metric {
+  + Id: string
+  + FlagId: string
+  + Timestamp: datetime
+  + Count: int
+  + Value: boolean
+}
+
+' Rate Limiting
+class RateLimit {
+  + Id: string
+  + Resource: string
+  + Limit: int
+  + Period: int
+  + CreatedAt: datetime
+  + UpdatedAt: datetime
+}
+
+' User/API Keys
+class ApiKey {
+  + Id: string
+  + Name: string
+  + Key: string
+  + Scopes: string[]
+  + CreatedAt: datetime
+  + ExpiresAt: datetime
+  + LastUsed: datetime
+}
+
+' Environment
+class Environment {
+  + Id: string
+  + Name: string
+  + Description: string
+  + CreatedAt: datetime
+}
+
+' Relationships
+FeatureFlag "1" -- "0..*" Rule : has
+Rule <|-- PercentageRule
+Rule <|-- UserAttributeRule
+Rule <|-- DateRule
+
+FeatureFlag "1" -- "0..*" AuditLog : triggers
+FeatureFlag "1" -- "0..*" Metric : generates
+
+Environment "1" -- "0..*" FeatureFlag : contains
+Environment "1" -- "0..*" ApiKey : has
+
+@enduml

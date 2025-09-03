@@ -1,0 +1,22 @@
+@startuml C4Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title "Edge Control Platform - System Context"
+
+Person(developer, "Developer", "Application developer integrating with feature flags")
+Person(admin, "Administrator", "Platform administrator configuring flags and rules")
+
+System(edge_control, "Edge Control Platform", "Feature flags and rate limiting platform")
+
+System_Ext(app_backend, "Customer App Backend", "Backend application using feature flags")
+System_Ext(app_frontend, "Customer App Frontend", "Frontend application using feature flags")
+System_Ext(monitoring, "Monitoring System", "Prometheus/Grafana for system monitoring")
+
+Rel(developer, edge_control, "Views documentation, creates API keys")
+Rel(admin, edge_control, "Manages feature flags and monitors usage")
+
+Rel(app_backend, edge_control, "Checks feature flags, respects rate limits")
+Rel(app_frontend, edge_control, "Checks feature flags via SDK")
+Rel(edge_control, monitoring, "Exports metrics")
+
+@enduml

@@ -1,0 +1,7 @@
+# Local development values
+environment      = "dev"
+aws_region       = "us-east-1"
+postgres_username = "postgres"
+postgres_password = "postgres"
+api_key          = "demo-key"
+image_tag        = "latest"

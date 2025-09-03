@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    .box { fill: #1976D2; stroke: #0D47A1; stroke-width: 2; }
+    .title { font-family: Arial, sans-serif; font-size: 24px; fill: white; }
+    .subtitle { font-family: Arial, sans-serif; font-size: 16px; fill: white; }
+    .banner { fill: #2196F3; }
+    .text { font-family: Arial, sans-serif; font-size: 20px; fill: #333; }
+    .highlight { font-weight: bold; }
+  </style>
+
+  <!-- Banner -->
+  <rect class="banner" x="0" y="0" width="1200" height="100" />
+  
+  <!-- Logo -->
+  <circle cx="70" cy="50" r="35" fill="#FFF" />
+  <text x="54" y="60" style="font-family: Arial, sans-serif; font-size: 40px; fill: #1976D2; font-weight: bold;">E</text>
+  
+  <!-- Title -->
+  <text x="120" y="60" style="font-family: Arial, sans-serif; font-size: 32px; fill: white; font-weight: bold;">Edge Control Platform</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="60" style="font-family: Arial, sans-serif; font-size: 20px; fill: white; text-anchor: middle;">Feature Flags and Rate Limiting Platform</text>
+
+  <!-- Main content background -->
+  <rect fill="#F5F5F5" x="0" y="100" width="1200" height="700" />
+  
+  <!-- Components -->
+  <g transform="translate(50, 150)">
+    <rect class="box" x="0" y="0" width="250" height="120" rx="5" />
+    <text class="title" x="125" y="40" text-anchor="middle">Feature Flags</text>
+    <text class="subtitle" x="125" y="70" text-anchor="middle">Percentage-based rollout</text>
+    <text class="subtitle" x="125" y="90" text-anchor="middle">User targeting</text>
+  </g>
+  
+  <g transform="translate(320, 150)">
+    <rect class="box" x="0" y="0" width="250" height="120" rx="5" />
+    <text class="title" x="125" y="40" text-anchor="middle">Rate Limiting</text>
+    <text class="subtitle" x="125" y="70" text-anchor="middle">C++ Token Bucket</text>
+    <text class="subtitle" x="125" y="90" text-anchor="middle">High performance</text>
+  </g>
+  
+  <g transform="translate(590, 150)">
+    <rect class="box" x="0" y="0" width="250" height="120" rx="5" />
+    <text class="title" x="125" y="40" text-anchor="middle">API Gateway</text>
+    <text class="subtitle" x="125" y="70" text-anchor="middle">Go Sidecar</text>
+    <text class="subtitle" x="125" y="90" text-anchor="middle">Circuit breaker, retries</text>
+  </g>
+  
+  <g transform="translate(860, 150)">
+    <rect class="box" x="0" y="0" width="250" height="120" rx="5" />
+    <text class="title" x="125" y="40" text-anchor="middle">Observability</text>
+    <text class="subtitle" x="125" y="70" text-anchor="middle">Prometheus + Grafana</text>
+    <text class="subtitle" x="125" y="90" text-anchor="middle">OpenTelemetry</text>
+  </g>
+  
+  <!-- Stack overview -->
+  <rect fill="#E0E0E0" x="50" y="320" width="1100" height="400" rx="5" />
+  <text class="text" x="575" y="350" text-anchor="middle" style="font-weight: bold;">Technology Stack</text>
+  
+  <text class="text" x="150" y="400" style="font-weight: bold;">API:</text>
+  <text class="text" x="200" y="400">.NET 8 Minimal APIs</text>
+  <text class="text" x="200" y="425">Entity Framework Core</text>
+  <text class="text" x="200" y="450">HotChocolate GraphQL</text>
+  
+  <text class="text" x="150" y="500" style="font-weight: bold;">Rate Limiter:</text>
+  <text class="text" x="200" y="500">C++20</text>
+  <text class="text" x="200" y="525">gRPC Interface</text>
+  <text class="text" x="200" y="550">Token Bucket Algorithm</text>
+  
+  <text class="text" x="600" y="400" style="font-weight: bold;">Proxy:</text>
+  <text class="text" x="650" y="400">Go 1.21</text>
+  <text class="text" x="650" y="425">Zero-downtime reloads</text>
+  <text class="text" x="650" y="450">Circuit breaker pattern</text>
+  
+  <text class="text" x="600" y="500" style="font-weight: bold;">SDKs:</text>
+  <text class="text" x="650" y="500">Node.js (TypeScript)</text>
+  <text class="text" x="650" y="525">Java</text>
+  <text class="text" x="650" y="550">Background polling</text>
+  
+  <text class="text" x="150" y="600" style="font-weight: bold;">Data Storage:</text>
+  <text class="text" x="200" y="625">PostgreSQL - Flags & Audit</text>
+  <text class="text" x="200" y="650">Redis - Cache</text>
+  
+  <text class="text" x="600" y="600" style="font-weight: bold;">Frontend:</text>
+  <text class="text" x="650" y="625">React + Material UI</text>
+  <text class="text" x="650" y="650">Vite</text>
+  
+  <text class="text" x="900" y="500" style="font-weight: bold;">Deployment:</text>
+  <text class="text" x="950" y="525">Docker Compose</text>
+  <text class="text" x="950" y="550">Kubernetes</text>
+  <text class="text" x="950" y="575">Terraform + AWS</text>
+</svg>

@@ -1,0 +1,100 @@
+@startuml sequence
+!theme cerulean
+
+title "Feature Flag Evaluation Sequence"
+
+actor "Client Application" as client
+participant "SDK" as sdk
+participant "Go Sidecar" as sidecar
+participant ".NET API" as api
+participant "Redis Cache" as redis
+participant "Rule Evaluator" as evaluator
+participant "PostgreSQL" as db
+participant "Rate Limiter" as limiter
+
+client -> sdk: isEnabled("feature-x", context)
+activate sdk
+
+group Background Polling (Happens periodically)
+  sdk -> sidecar: GET /flags (with ETag)
+  activate sidecar
+  sidecar -> api: GET /flags (with ETag)
+  activate api
+  api -> redis: Get cached flags
+  activate redis
+  
+  alt Cache hit with valid ETag
+    redis --> api: Return 304 Not Modified
+    api --> sidecar: 304 Not Modified
+    sidecar --> sdk: 304 Not Modified
+  else Cache miss or invalid ETag
+    redis --> api: Cache miss or expired
+    api -> db: Query for flags
+    activate db
+    db --> api: Return flags
+    deactivate db
+    api -> redis: Cache flags with ETag
+    redis --> api: OK
+    api --> sidecar: 200 OK with flags
+    sidecar --> sdk: Return flags
+    sdk -> sdk: Update local cache
+  end
+  
+  deactivate redis
+  deactivate api
+  deactivate sidecar
+end
+
+sdk -> sdk: Evaluate flag against context
+activate sdk
+
+note right of sdk
+  Local evaluation using cached rules:
+  1. Check if flag exists
+  2. Check if flag is enabled
+  3. Apply targeting rules
+  4. Apply percentage rollout
+end note
+
+alt Local evaluation sufficient
+  sdk --> client: Return decision (boolean)
+else Complex rule or forced evaluation
+  sdk -> sidecar: POST /flags/{key}/evaluate (context)
+  activate sidecar
+  sidecar -> api: POST /flags/{key}/evaluate (context)
+  activate api
+  
+  api -> redis: Check rate limits
+  activate redis
+  redis --> api: Rate limit status
+  deactivate redis
+  
+  alt Rate limited
+    api -> limiter: Check rate limit
+    activate limiter
+    limiter --> api: Rejected (limit exceeded)
+    deactivate limiter
+    api --> sidecar: 429 Too Many Requests
+    sidecar --> sdk: Rate limit exceeded
+    sdk --> client: Return default value
+  else Not rate limited
+    api -> evaluator: Evaluate rules
+    activate evaluator
+    evaluator -> evaluator: Apply targeting rules
+    evaluator -> evaluator: Consistent hashing for % rollout
+    evaluator --> api: Evaluation result
+    deactivate evaluator
+    
+    api -> redis: Cache evaluation result (user+flag)
+    api --> sidecar: 200 OK with decision
+    sidecar --> sdk: Return decision
+    sdk --> client: Return decision (boolean)
+  end
+  
+  deactivate api
+  deactivate sidecar
+end
+
+deactivate sdk
+
+@enduml

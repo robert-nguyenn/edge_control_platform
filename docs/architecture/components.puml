@@ -1,0 +1,56 @@
+@startuml C4Component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title "Edge Control Platform - Component Diagram"
+
+Container_Boundary(api_boundary, ".NET API") {
+    Component(rest_api, "REST API", ".NET 8 Minimal API", "Provides REST endpoints for flag management")
+    Component(graphql_api, "GraphQL API", "HotChocolate", "Provides GraphQL interface for flag management")
+    Component(flag_service, "Flag Service", "C# Service", "Manages feature flag business logic")
+    Component(rule_evaluator, "Rule Evaluator", "C# Library", "Evaluates rules against user context")
+    Component(ef_core, "EF Core", "Entity Framework Core", "ORM for database access")
+    Component(redis_client, "Redis Client", "StackExchange.Redis", "Client for Redis caching")
+    Component(rate_limiter_client, "Rate Limiter Client", "gRPC Client", "Client for C++ rate limiter")
+    Component(telemetry, "Telemetry", "OpenTelemetry", "Collects and exports metrics")
+}
+
+Container(web_admin, "Web Admin UI", "React + Material UI", "Management interface for flags and rules")
+Container(go_sidecar, "Go Sidecar", "Go 1.21", "Resilience layer with circuit breakers")
+
+Container_Boundary(cpp_rate_limiter, "C++ Rate Limiter") {
+    Component(grpc_server, "gRPC Server", "C++", "Accepts rate limit requests")
+    Component(token_bucket, "Token Bucket", "C++", "Implements token bucket algorithm")
+    Component(redis_storage, "Redis Storage", "C++", "Stores bucket state in Redis")
+}
+
+ContainerDb(postgres, "PostgreSQL", "Database", "Stores feature flags, rules, and audit logs")
+ContainerDb(redis, "Redis", "In-memory cache", "Caches flags and rate limiter state")
+
+Rel(web_admin, rest_api, "Uses", "HTTPS")
+Rel(web_admin, graphql_api, "Uses", "HTTPS")
+
+Rel(go_sidecar, rest_api, "Routes to", "HTTP")
+Rel(go_sidecar, graphql_api, "Routes to", "HTTP")
+
+Rel(rest_api, flag_service, "Uses")
+Rel(graphql_api, flag_service, "Uses")
+Rel(flag_service, rule_evaluator, "Uses")
+Rel(flag_service, ef_core, "Uses")
+Rel(flag_service, redis_client, "Uses")
+Rel(flag_service, rate_limiter_client, "Uses")
+
+Rel(ef_core, postgres, "Reads/Writes", "SQL/TLS")
+Rel(redis_client, redis, "Reads/Writes", "Redis protocol")
+Rel(rate_limiter_client, grpc_server, "Requests rate limits", "gRPC")
+
+Rel(grpc_server, token_bucket, "Uses")
+Rel(token_bucket, redis_storage, "Stores state")
+Rel(redis_storage, redis, "Reads/Writes", "Redis protocol")
+
+Rel_U(rest_api, telemetry, "Reports metrics")
+Rel_U(graphql_api, telemetry, "Reports metrics")
+Rel_U(flag_service, telemetry, "Reports metrics")
+Rel_U(grpc_server, telemetry, "Reports metrics")
+Rel_U(token_bucket, telemetry, "Reports metrics")
+
+@enduml
