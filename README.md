@@ -190,7 +190,6 @@ _Benchmarked on standard 4-core instances. Your results may vary depending on ha
 This project was developed by [Robert Nguyen](https://github.com/robert-nguyenn), a software engineer specializing in distributed systems and high-performance applications.
 
 📧 Email: robert.nguyenanh@gmail.com  
-🔗 GitHub: [github.com/robert-nguyenn](https://github.com/robert-nguyenn)  
 🌐 LinkedIn: [linkedin.com/in/robert-nguyen](https://www.linkedin.com/in/robert-nguyenn/)
 
 ## License
@@ -201,3 +200,4 @@ MIT
 
 
 Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to get involved.
+
