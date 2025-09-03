@@ -1,0 +1,93 @@
+@startuml
+!theme cerulean
+
+title "Consistent Hashing for Feature Flag Rollouts"
+
+actor "User A" as userA
+actor "User B" as userB
+actor "User C" as userC
+participant "Feature Flag SDK" as sdk
+participant "Consistent Hashing\nAlgorithm" as hashing
+
+note over hashing #lightblue
+  <b>Consistent Hashing Ensures:</b>
+  1. Same user always gets same decision
+  2. User distribution is uniform
+  3. Adding/removing users doesn't cause cascade changes
+  4. Gradual rollouts maintain previous assignments
+end note
+
+== Initial 10% Rollout ==
+
+userA -> sdk: Check feature flag status
+activate sdk
+sdk -> hashing: IsUserInPercentage(UserA, "new-feature", 10%)
+activate hashing
+hashing -> hashing: hash = SHA256("UserA:new-feature")
+hashing -> hashing: bucket = hash % 10000 = 932
+hashing -> hashing: threshold = 10% × 10000 = 1000
+hashing -> hashing: 932 < 1000 ✓
+hashing --> sdk: true (included in rollout)
+deactivate hashing
+sdk --> userA: Feature enabled
+deactivate sdk
+
+userB -> sdk: Check feature flag status
+activate sdk
+sdk -> hashing: IsUserInPercentage(UserB, "new-feature", 10%)
+activate hashing
+hashing -> hashing: hash = SHA256("UserB:new-feature")
+hashing -> hashing: bucket = hash % 10000 = 8721
+hashing -> hashing: threshold = 10% × 10000 = 1000
+hashing -> hashing: 8721 > 1000 ✗
+hashing --> sdk: false (not included in rollout)
+deactivate hashing
+sdk --> userB: Feature disabled
+deactivate sdk
+
+userC -> sdk: Check feature flag status
+activate sdk
+sdk -> hashing: IsUserInPercentage(UserC, "new-feature", 10%)
+activate hashing
+hashing -> hashing: hash = SHA256("UserC:new-feature")
+hashing -> hashing: bucket = hash % 10000 = 342
+hashing -> hashing: threshold = 10% × 10000 = 1000
+hashing -> hashing: 342 < 1000 ✓
+hashing --> sdk: true (included in rollout)
+deactivate hashing
+sdk --> userC: Feature enabled
+deactivate sdk
+
+== Later 25% Rollout ==
+note over hashing
+  Users previously included remain included
+  as the percentage increases
+end note
+
+userA -> sdk: Check feature flag status
+activate sdk
+sdk -> hashing: IsUserInPercentage(UserA, "new-feature", 25%)
+activate hashing
+hashing -> hashing: hash = SHA256("UserA:new-feature")
+hashing -> hashing: bucket = hash % 10000 = 932 (same as before)
+hashing -> hashing: threshold = 25% × 10000 = 2500
+hashing -> hashing: 932 < 2500 ✓
+hashing --> sdk: true (included in rollout)
+deactivate hashing
+sdk --> userA: Feature enabled
+deactivate sdk
+
+userB -> sdk: Check feature flag status
+activate sdk
+sdk -> hashing: IsUserInPercentage(UserB, "new-feature", 25%)
+activate hashing
+hashing -> hashing: hash = SHA256("UserB:new-feature")
+hashing -> hashing: bucket = hash % 10000 = 8721 (same as before)
+hashing -> hashing: threshold = 25% × 10000 = 2500
+hashing -> hashing: 8721 > 2500 ✗
+hashing --> sdk: false (still not included in rollout)
+deactivate hashing
+sdk --> userB: Feature disabled
+deactivate sdk
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml
+!theme cerulean
+
+title "Edge Control Platform Fault Tolerance - Circuit Breaker Pattern"
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+participant "Client SDK" as client
+participant "Go Sidecar" as sidecar
+participant ".NET API" as api
+database "Redis" as redis
+database "PostgreSQL" as db
+
+== Normal Operation (Circuit Closed) ==
+client -> sidecar: Request feature flag
+activate sidecar
+sidecar -> api: Forward request
+activate api
+api -> redis: Check cache
+activate redis
+redis --> api: Cache hit
+deactivate redis
+api --> sidecar: Return flag data
+deactivate api
+sidecar --> client: Flag data with 200 OK
+deactivate sidecar
+
+== Degraded Operation (Circuit Half-Open) ==
+client -> sidecar: Request feature flag
+activate sidecar
+note over sidecar: Recent failures detected\nCircuit half-open\nOnly allow % of traffic
+sidecar -> api: Forward canary request
+activate api
+api -> redis: Check cache
+activate redis
+note over redis: Redis timeout
+redis --> api: Error (timeout)
+deactivate redis
+api -> db: Fallback to direct DB query
+activate db
+db --> api: Database response
+deactivate db
+api --> sidecar: Return flag data (slow path)
+deactivate api
+sidecar --> client: Flag data with 200 OK
+deactivate sidecar
+note over sidecar: Record success\nBegin closing circuit
+
+== Failure Isolation (Circuit Open) ==
+client -> sidecar: Request feature flag
+activate sidecar
+note over sidecar: Too many failures\nCircuit open\nFailing fast
+sidecar -> sidecar: Use cached values
+sidecar --> client: Cached flag data with header X-Circuit-Open
+deactivate sidecar
+note over sidecar: After timeout period\nswitch to half-open
+
+@enduml

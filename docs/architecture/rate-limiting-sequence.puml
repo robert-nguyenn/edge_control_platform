@@ -1,0 +1,67 @@
+@startuml
+!theme cerulean
+
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam monochrome false
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam packageStyle rectangle
+
+title "Advanced Rate Limiting Flow - Token Bucket Implementation"
+
+participant "API Gateway\n(Go Sidecar)" as gateway
+participant "API Server\n(.NET)" as api
+participant "Rate Limiter\n(C++)" as limiter
+database "Redis" as redis
+
+autonumber "<b>[000]"
+
+note over gateway, redis #lightblue
+  <b>Real-time adaptive rate limiting with distributed state</b>
+  This diagram shows how the Edge Control Platform handles sophisticated
+  rate limiting using an enhanced token bucket algorithm.
+end note
+
+== Client Categorization ==
+gateway -> api : Request with client ID
+activate gateway
+activate api
+
+api -> api : Extract client information
+api -> limiter : AllowRequest(key, token_cost, client_id)
+activate limiter
+
+limiter -> limiter : Look up client category\n(premium/standard/free)
+limiter -> limiter : Calculate adjusted cost based on category
+
+== Distributed State Management ==
+limiter -> redis : EVAL LuaScript (atomic token bucket operation)
+activate redis
+redis -> redis : Get or initialize bucket state
+redis -> redis : Calculate token refill based on elapsed time
+redis -> redis : Check if enough tokens remain
+redis -> redis : Update bucket state atomically
+redis --> limiter : Result (allowed, tokens_remaining, retry_after)
+deactivate redis
+
+== Adaptive Rate Limiting ==
+limiter -> limiter : Record request metrics\n(latency, rejection status)
+limiter -> limiter : Periodically adjust rates\nbased on system load
+limiter --> api : AllowResponse(allowed, retry_after_ms, quota_remaining)
+deactivate limiter
+
+== Response Handling ==
+alt Request Allowed
+  api --> gateway : HTTP 200 OK
+  gateway --> [: Process request
+else Rate Limited
+  api -> api : Generate Retry-After header
+  api --> gateway : HTTP 429 Too Many Requests
+  gateway --> [: Error response with backoff guidance
+end
+
+deactivate api
+deactivate gateway
+
+@enduml
