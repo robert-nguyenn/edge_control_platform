@@ -13,17 +13,6 @@
 [![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)](https://graphql.org/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-### 🏆 **Key Differentiators:**
-- **50+ production-quality files** with **8,000+ lines of optimized code**
-- **100K+ decisions/second** rate limiting with **<1ms P99 latency**
-- **Polyglot microservices** (.NET, C++, Go) optimized for specific use cases
-- **Advanced consistent hashing** for stable feature rollout experiences
-- **Circuit breaker resilience** with automatic failure recovery
-- **Enterprise observability** with OpenTelemetry and custom dashboards
-
----
-
-
 ## 🌟 Overview
 
 Edge Control Platform is an **enterprise-ready feature flags system** with advanced rate limiting capabilities, designed for rapid adoption by backend services. Developed with a focus on **performance, resilience, and scalability**, it provides a robust solution for progressive feature rollouts, sophisticated A/B/n testing, and intelligent traffic management.
@@ -141,20 +130,6 @@ if (isEnabled) {
 
 ---
 
-## 📊 **Performance Benchmarks** - *Enterprise-Grade Performance*
-
-| **Component** | **Throughput** | **Latency (p99)** | **Memory Usage** | **Scale Tested** |
-|---------------|----------------|-------------------|------------------|------------------|
-| **.NET API** | **20,000 req/s** | **15ms** | **200MB** | 1000 concurrent users |
-| **C++ Rate Limiter** | **100,000 req/s** | **<1ms** | **50MB** | 10K+ decisions/second |
-| **Go Sidecar** | **30,000 req/s** | **5ms** | **30MB** | Circuit breaker resilience |
-| **Node.js SDK** | **5,000 ops/s** | **3ms** | **20MB** | Background polling |
-| **Java SDK** | **10,000 ops/s** | **5ms** | **40MB** | Thread-safe operations |
-
-_🔬 **Benchmarked on standard 4-core instances**. Your results may vary depending on hardware and configuration._
-
----
-
 ## 📊 **Enterprise Deployment Options** - *Production-Ready Scaling*
 
 The Edge Control Platform supports multiple deployment models to fit diverse enterprise requirements:
@@ -232,20 +207,6 @@ cd tests
 - **⚡ [Rate Limiter Algorithm](./docs/rate-limiter-algorithm.md)** - In-depth explanation of the rate limiting algorithm
 - **🏗️ [Architecture Diagrams](./docs/architecture/)** - Detailed technical architecture diagrams
 
----
-
-| **Component** | **Throughput** | **Latency (p99)** | **Memory Usage** | **Scale Tested** |
-|---------------|----------------|-------------------|------------------|------------------|
-| **.NET API** | **20,000 req/s** | **15ms** | **200MB** | 1000 concurrent users |
-| **C++ Rate Limiter** | **100,000 req/s** | **<1ms** | **50MB** | 10K+ decisions/second |
-| **Go Sidecar** | **30,000 req/s** | **5ms** | **30MB** | Circuit breaker resilience |
-| **Node.js SDK** | **5,000 ops/s** | **3ms** | **20MB** | Background polling |
-| **Java SDK** | **10,000 ops/s** | **5ms** | **40MB** | Thread-safe operations |
-
-_🔬 **Benchmarked on standard 4-core instances**. Your results may vary depending on hardware and configuration._
-
----
-
 ## 🎯 **Skills Demonstrated** - *Directly Relevant to Big Tech*
 
 ### **🏗️ System Design & Architecture**
@@ -271,20 +232,6 @@ _🔬 **Benchmarked on standard 4-core instances**. Your results may vary depend
 
 **Robert Nguyen** - Passionate Software Engineer  
 📧 **Email:** [robert.nguyenanh@gmail.com](mailto:robert.nguyenanh@gmail.com)  
-🔗 **GitHub:** [github.com/robert-nguyenn](https://github.com/robert-nguyenn)  
-🌐 **LinkedIn:** [linkedin.com/in/robert-nguyen](https://linkedin.com/in/robert-nguyen)
----
-
-## 📝 **Project Statistics**
-
-| **Metric** | **Count** | **Significance** |
-|------------|-----------|------------------|
-| **Total Files** | **50+** | Production-ready structure |
-| **Lines of Code** | **8,000+** | Enterprise-scale implementation |
-| **Languages Used** | **6** | Full-stack expertise |
-| **Services Implemented** | **5** | Microservices mastery |
-| **Performance SLAs Met** | **100%** | Production-ready performance |
-| **Documentation Pages** | **10+** | Professional documentation |
 
 ---
 
@@ -296,10 +243,6 @@ _🔬 **Benchmarked on standard 4-core instances**. Your results may vary depend
 - **📊 Audit Logging** for compliance and forensics
 - **🚫 Rate Limiting** preventing abuse and DoS attacks
 - **🔍 Security Headers** following OWASP guidelines---
-
-**🌟 This project represents 80+ hours of dedicated engineering work, showcasing the technical depth and professional quality expected at top-tier technology companies. Every line of code, architectural decision, and system design choice demonstrates readiness for challenging, high-impact software engineering roles.**
-
-**🚀 Ready to discuss how these skills can contribute to your team's success!**
 
 ---
 
@@ -318,4 +261,5 @@ Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) 
 <i>Built with ❤️ by Robert Nguyen</i>
 
 </div>
+
 
